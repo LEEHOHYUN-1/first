@@ -1,0 +1,84 @@
+#include <string>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+void quickSort(vector<int>& citations, int left, int right) {
+    if (left < right) {
+        int pivot = citations[right];
+        int i = left - 1;
+        for (int j = left; j < right; j++) {
+            if (citations[j] >= pivot) {
+                i++;
+                swap(citations[i], citations[j]);
+            }
+        }
+        swap(citations[i + 1], citations[right]);
+        int partitionIndex = i + 1;
+
+        quickSort(citations, left, partitionIndex - 1);
+        quickSort(citations, partitionIndex + 1, right);
+    }
+}
+
+void merge(vector<int>& citations, int left, int mid, int right) {
+    int n1 = mid - left + 1;
+    int n2 = right - mid;
+
+    vector<int> L(n1), R(n2);
+    for (int i = 0; i < n1; i++)
+        L[i] = citations[left + i];
+    for (int j = 0; j < n2; j++)
+        R[j] = citations[mid + 1 + j];
+
+    int i = 0, j = 0, k = left;
+    while (i < n1 && j < n2) {
+        if (L[i] >= R[j]) {
+            citations[k++] = L[i++];
+        } else {
+            citations[k++] = R[j++];
+        }
+    }
+
+    while (i < n1) {
+        citations[k++] = L[i++];
+    }
+
+    while (j < n2) {
+        citations[k++] = R[j++];
+    }
+}
+
+void mergeSort(vector<int>& citations, int left, int right) {
+    if (left < right) {
+        int mid = left + (right - left) / 2;
+        mergeSort(citations, left, mid);
+        mergeSort(citations, mid + 1, right);
+        merge(citations, left, mid, right);
+    }
+}
+
+int solution(vector<int> citations) {
+    
+    int lastDigit = 1; 
+    
+    if (lastDigit % 2 == 0) {
+        mergeSort(citations, 0, citations.size() - 1);
+    } else {
+        quickSort(citations, 0, citations.size() - 1);
+    }
+
+    int n = citations.size();
+    int hIndex = 0;
+
+    for (int h = 0; h < n; h++) {
+        if (citations[h] >= h + 1) {
+            hIndex = h + 1;
+        } else {
+            break;
+        }
+    }
+
+    return hIndex;
+}
